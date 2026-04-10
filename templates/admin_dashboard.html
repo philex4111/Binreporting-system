@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Umoja Estate</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="brand">Umoja<span>.</span></div>
+  <nav>
+    <a href="/admin_dashboard" class="active">Dashboard</a>
+  </nav>
+  <div class="nav-actions">
+    <span style="color:rgba(255,255,255,0.5); font-size:0.85rem;">Admin</span>
+    <button class="logout-pill" onclick="window.location.href='/logout'">Logout</button>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <div class="page-header">
+    <h2>Admin Dashboard</h2>
+    <p>Manage users, view activity, and control system access.</p>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-card accent-card">
+      <div class="stat-label">Total Users</div>
+      <div class="stat-number">{{ users | length }}</div>
+      <div class="stat-sub">Across all roles</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Residents</div>
+      <div class="stat-number">{{ users.values() | selectattr('role','equalto','resident') | list | length }}</div>
+      <div class="stat-sub">Active accounts</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Managers</div>
+      <div class="stat-number">{{ users.values() | selectattr('role','equalto','manager') | list | length }}</div>
+      <div class="stat-sub">Active accounts</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Reports</div>
+      <div class="stat-number">{{ reports | length }}</div>
+      <div class="stat-sub">Bin reports logged</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+
+    <div class="card" style="grid-column: 1 / -1;">
+      <div class="card-title"><span class="dot"></span> System Users</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user, info in users.items() %}
+          <tr>
+            <td>
+              <a href="/admin_view/{{ user }}" style="font-weight:600; color:#141414;">
+                {{ user | capitalize }}
+              </a>
+            </td>
+            <td>
+              {% if info.role == 'admin' %}
+                <span class="badge badge-yellow">Admin</span>
+              {% elif info.role == 'manager' %}
+                <span class="badge badge-blue">Manager</span>
+              {% else %}
+                <span class="badge badge-gray">Resident</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if user != 'admin' %}
+              <form method="POST" action="/admin_dashboard" style="display:inline;">
+                <input type="hidden" name="username" value="{{ user }}">
+                <button type="submit" name="action" value="delete" class="btn btn-danger btn-sm">Delete</button>
+              </form>
+              {% else %}
+              <span style="font-size:0.82rem; color:#aaa;">🔒 Protected</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <div class="card" style="max-width:520px;">
+    <div class="card-title"><span class="dot"></span> Add New User</div>
+    
+    {% if error %}
+      <div class="error-msg" style="margin-bottom: 16px;">⚠ {{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="/admin_dashboard">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" name="username" placeholder="e.g. john_doe" required>
+      </div>
+      <div class="form-group">
+        <label>Password <span style="color:#aaa; font-weight:400;">(leave blank for default: 1234)</span></label>
+        <input type="text" name="password" placeholder="Optional password">
+      </div>
+      <div class="form-group">
+        <label>Role</label>
+        <select name="role" required>
+          <option value="resident">Resident</option>
+          <option value="manager">Manager</option>
+        </select>
+      </div>
+      <button type="submit" name="action" value="add" class="btn btn-dark">Add User</button>
+    </form>
+  </div>
+</div>
+</body>
+</html>

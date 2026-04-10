@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="hero-wrap">
+  <div class="hero-box">
+    <div class="hero-tag">🌿 Umoja Estate</div>
+    <h1>Keep Our Estate <em>Clean</em> &amp; Green</h1>
+    <p>Report overflowing bins, track collection schedules, and help keep Umoja Estate healthy for every resident.</p>
+    <a href="{{ url_for('login') }}" class="btn btn-dark" style="font-size:1rem; padding:14px 32px; border-radius:12px;">
+      Get Started →
+    </a>
+
+    <div style="display:flex; gap:24px; justify-content:center; margin-top:48px; padding-top:32px; border-top:1px solid #e8e4dc;">
+      <div style="text-align:center;">
+        <div style="font-family:'DM Serif Display',serif; font-size:1.8rem;">🗑️</div>
+        <div style="font-size:0.8rem; color:#888; margin-top:4px; font-weight:600;">Report Bins</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-family:'DM Serif Display',serif; font-size:1.8rem;">📅</div>
+        <div style="font-size:0.8rem; color:#888; margin-top:4px; font-weight:600;">Collection Dates</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-family:'DM Serif Display',serif; font-size:1.8rem;">💬</div>
+        <div style="font-size:0.8rem; color:#888; margin-top:4px; font-weight:600;">Manager Messages</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-family:'DM Serif Display',serif; font-size:1.8rem;">📊</div>
+        <div style="font-size:0.8rem; color:#888; margin-top:4px; font-weight:600;">Live Reports</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ username | capitalize }} — Admin View</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="brand">Umoja<span>.</span></div>
+  <nav>
+    <a href="/admin_dashboard">Dashboard</a>
+  </nav>
+  <div class="nav-actions">
+    <button class="logout-pill" onclick="window.location.href='/logout'">Logout</button>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <a href="/admin_dashboard" class="back-link">← Back to Admin Dashboard</a>
+
+  <!-- Profile Header -->
+  <div class="profile-header">
+    <div class="profile-avatar">{{ username[0] | upper }}</div>
+    <div class="profile-info">
+      <h2>{{ username | capitalize }}</h2>
+      <p>{{ role | capitalize }} · Umoja Estate</p>
+      {% if role == 'admin' %}
+        <span class="badge badge-yellow" style="margin-top:6px;">Admin</span>
+      {% elif role == 'manager' %}
+        <span class="badge badge-blue" style="margin-top:6px;">Manager</span>
+      {% else %}
+        <span class="badge badge-gray" style="margin-top:6px;">Resident</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Reports -->
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> Reports</div>
+    {% if reports %}
+    <table class="data-table">
+      <thead><tr><th>Date</th><th>Status</th><th>Concerns</th></tr></thead>
+      <tbody>
+        {% for r in reports %}
+        <tr>
+          <td>{{ r.date }}</td>
+          <td><span class="badge {{ 'badge-red' if r.status == 'Full' else 'badge-green' }}">{{ r.status }}</span></td>
+          <td>{{ r.concerns or '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <p style="color:#aaa; font-size:0.9rem;">No reports submitted.</p>
+    {% endif %}
+  </div>
+
+  <div class="two-col">
+    <!-- Messages -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span> Messages</div>
+      {% if messages %}
+        {% for m in messages %}
+        <div class="msg-item">
+          <div class="msg-meta">From {{ m.sender }} · {{ m.time }}</div>
+          <div class="msg-body">{{ m.text }}</div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p style="color:#aaa; font-size:0.9rem;">No messages.</p>
+      {% endif %}
+    </div>
+
+    <!-- Assignments -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span> Collection Assignments</div>
+      {% if assignments %}
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          {% for a in assignments %}
+            <span class="badge badge-blue" style="width:fit-content;">📅 {{ a.collection_date }}</span>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p style="color:#aaa; font-size:0.9rem;">No assigned collection dates.</p>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

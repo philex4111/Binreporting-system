@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manager Dashboard — Umoja Estate</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="brand">Umoja<span>.</span></div>
+  <nav>
+    <a href="/dashboard" class="active">Overview</a>
+    <a href="/generate_report">Report</a>
+  </nav>
+  <div class="nav-actions">
+    <span style="color:rgba(255,255,255,0.5); font-size:0.85rem;">Manager</span>
+    <button class="logout-pill" onclick="confirmLogout()">Logout</button>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <h2>Manager Dashboard</h2>
+    <p>Monitor bin statuses and manage collection schedules for all residents.</p>
+  </div>
+
+  <!-- Stats Row -->
+  {% set full_count = resident_status | selectattr('status','equalto','Full') | list | length %}
+  {% set empty_count = resident_status | selectattr('status','equalto','Empty') | list | length %}
+  <div class="stat-row">
+    <div class="stat-card accent-card">
+      <div class="stat-label">Total Residents</div>
+      <div class="stat-number">{{ resident_status | length }}</div>
+      <div class="stat-sub">Registered in system</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Full Bins</div>
+      <div class="stat-number" style="color:#e74c3c;">{{ full_count }}</div>
+      <div class="stat-sub">Need collection</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Empty Bins</div>
+      <div class="stat-number" style="color:#2ecc71;">{{ empty_count }}</div>
+      <div class="stat-sub">Collected / Clear</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Reports</div>
+      <div class="stat-number">{{ reports | length }}</div>
+      <div class="stat-sub">All time</div>
+    </div>
+  </div>
+
+  <!-- Resident Status Grid -->
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> Resident Bin Status</div>
+    <div class="resident-grid">
+      {% for r in resident_status %}
+      <div class="res-card" onclick="window.location.href='/resident/{{ r.name }}'">
+        <div class="res-avatar">{{ r.name[0] | upper }}</div>
+        <div class="res-name">{{ r.name }}</div>
+        <div style="margin:8px 0;">
+          {% if r.status == 'Full' %}
+            <span class="badge badge-red">Full</span>
+          {% else %}
+            <span class="badge badge-green">Empty</span>
+          {% endif %}
+        </div>
+        <div class="res-date">
+          {% if r.last_collection %}📅 {{ r.last_collection }}{% else %}No date assigned{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Assign Date + Send Message (two-col) -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title"><span class="dot"></span> Assign Collection Date</div>
+      <form method="POST" action="/assign">
+        <div class="form-group">
+          <label>Select Resident</label>
+          <select name="resident" required>
+            {% for r in resident_status %}
+            <option value="{{ r.name }}">{{ r.name | capitalize }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Collection Date</label>
+          <input type="date" name="collection_date" required>
+        </div>
+        <button type="submit" class="btn btn-dark">Assign Date</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot"></span> Send Message</div>
+      <form method="POST" action="/reply">
+        <div class="form-group">
+          <label>Resident</label>
+          <select name="resident" required>
+            {% for r in resident_status %}
+            <option value="{{ r.name }}">{{ r.name | capitalize }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Message</label>
+          <textarea name="message" placeholder="Write your message..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-dark">Send Message</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Broadcast -->
+  <div class="card" style="max-width:600px;">
+    <div class="card-title"><span class="dot"></span> Broadcast to All Residents</div>
+    <form method="POST" action="/broadcast">
+      <div class="form-group">
+        <label>Broadcast Message</label>
+        <textarea name="message" placeholder="This message will be sent to every resident..." required></textarea>
+      </div>
+      <button type="submit" class="btn btn-accent">📢 Send Broadcast</button>
+    </form>
+  </div>
+
+</div>
+
+<script>
+  function confirmLogout() {
+    if (confirm("Are you sure you want to log out?")) window.location.href = "/logout";
+  }
+</script>
+</body>
+</html>

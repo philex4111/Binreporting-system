@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Umoja Estate — Bin Reporting System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <nav class="topnav">
+    <div class="brand">Umoja<span>.</span></div>
+    <div class="nav-actions">
+      {% if session.get('username') %}
+        <span style="color:rgba(255,255,255,0.5); font-size:0.85rem;">{{ session['username'] | capitalize }}</span>
+        <button class="logout-pill" onclick="window.location.href='/logout'">Logout</button>
+      {% endif %}
+    </div>
+  </nav>
+
+  {% block content %}{% endblock %}
+
+</body>
+</html>

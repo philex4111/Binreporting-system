@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generate Report — Umoja Estate</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="brand">Umoja<span>.</span></div>
+  <nav>
+    <a href="/dashboard">Overview</a>
+    <a href="/generate_report" class="active">Report</a>
+  </nav>
+  <div class="nav-actions">
+    <button class="logout-pill" onclick="window.location.href='/logout'">Logout</button>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <a href="/dashboard" class="back-link">← Back to Dashboard</a>
+
+  <!-- Report Hero -->
+  <div class="report-hero">
+    <h1>Umoja Estate Bin Report</h1>
+    <p class="ts">Generated on {{ timestamp }}</p>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="report-stat-grid">
+    <div class="report-stat total">
+      <div class="rs-num">{{ total_reports }}</div>
+      <div class="rs-label">Total Reports</div>
+    </div>
+    <div class="report-stat full">
+      <div class="rs-num">{{ full_bins }}</div>
+      <div class="rs-label">Full Bins</div>
+    </div>
+    <div class="report-stat empty">
+      <div class="rs-num">{{ empty_bins }}</div>
+      <div class="rs-label">Empty Bins</div>
+    </div>
+  </div>
+
+  <!-- Summary Card -->
+  <div class="card" style="margin-top:24px; max-width:560px;">
+    <div class="card-title"><span class="dot"></span> Summary</div>
+    <p style="font-size:0.95rem; color:#444; line-height:1.7;">
+      A total of <strong>{{ total_reports }}</strong> bin reports have been submitted by residents.
+      Of these, <strong style="color:#e74c3c;">{{ full_bins }}</strong> reported full bins requiring collection,
+      and <strong style="color:#2ecc71;">{{ empty_bins }}</strong> reported empty or collected bins.
+    </p>
+    {% if total_reports > 0 %}
+    <div style="margin-top:16px; height:8px; border-radius:8px; background:#f0ede5; overflow:hidden;">
+      <div id="progress-fill" data-pct="{{ (full_bins / total_reports * 100) | int }}"
+           style="height:100%; width:0; background:var(--red); border-radius:8px; transition:width 0.6s ease;"></div>
+    </div>
+    <div style="display:flex; justify-content:space-between; font-size:0.78rem; color:#aaa; margin-top:6px;">
+      <span>Full {{ (full_bins / total_reports * 100) | int }}%</span>
+      <span>Empty {{ (empty_bins / total_reports * 100) | int }}%</span>
+    </div>
+    <script>
+      var el = document.getElementById('progress-fill');
+      if (el) el.style.width = el.getAttribute('data-pct') + '%';
+    </script>
+    {% endif %}
+  </div>
+
+</div>
+</body>
+</html>

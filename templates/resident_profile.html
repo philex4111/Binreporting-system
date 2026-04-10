@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ resident | capitalize }} — Profile</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="brand">Umoja<span>.</span></div>
+  <nav>
+    <a href="/dashboard">Overview</a>
+  </nav>
+  <div class="nav-actions">
+    <button class="logout-pill" onclick="window.location.href='/logout'">Logout</button>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <a href="{{ url_for('dashboard') }}" class="back-link">← Back to Dashboard</a>
+
+  <!-- Profile Header -->
+  <div class="profile-header">
+    <div class="profile-avatar">{{ resident[0] | upper }}</div>
+    <div class="profile-info">
+      <h2>{{ resident | capitalize }}</h2>
+      <p>Resident · Umoja Estate</p>
+      {% set last_status = 'Empty' %}
+      {% if reports %}{% set last_status = reports[-1]['status'] %}{% endif %}
+      <span class="badge {{ 'badge-red' if last_status == 'Full' else 'badge-green' }}" style="margin-top:6px;">
+        {{ last_status }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Status Banner -->
+  {% set last_status = 'Empty' %}
+  {% if reports %}{% set last_status = reports[-1]['status'] %}{% endif %}
+  <div class="status-banner {{ 'full' if last_status == 'Full' else 'empty' }}" style="margin-bottom:24px;">
+    <div>
+      <div class="status-text">
+        {% if last_status == 'Full' %}🗑 Bin is Full{% else %}✅ Bin is Empty / Collected{% endif %}
+      </div>
+      <div class="status-sub">
+        {% if last_collection %}Last collection: {{ last_collection }}{% else %}No collection date recorded{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+
+    <!-- Reports -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span> Reports Submitted</div>
+      {% if reports %}
+      <table class="data-table">
+        <thead><tr><th>Date</th><th>Status</th><th>Concerns</th></tr></thead>
+        <tbody>
+          {% for r in reports %}
+          <tr>
+            <td>{{ r.date }}</td>
+            <td><span class="badge {{ 'badge-red' if r.status == 'Full' else 'badge-green' }}">{{ r.status }}</span></td>
+            <td>{{ r.concerns or '—' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+        <p style="color:#aaa; font-size:0.9rem;">No reports found.</p>
+      {% endif %}
+    </div>
+
+    <!-- Assignments + Messages -->
+    <div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span> Collection Assignments</div>
+        {% if assignments %}
+          <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            {% for a in assignments %}
+              <span class="badge badge-blue">📅 {{ a.collection_date }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p style="color:#aaa; font-size:0.9rem;">No assigned dates yet.</p>
+        {% endif %}
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span> Messages Sent</div>
+        {% if messages %}
+          {% for m in messages %}
+          <div class="msg-item">
+            <div class="msg-meta">{{ m.time }}</div>
+            <div class="msg-body">{{ m.text }}</div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p style="color:#aaa; font-size:0.9rem;">No messages yet.</p>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Reply Form -->
+  <div class="card" style="max-width:560px;">
+    <div class="card-title"><span class="dot"></span> Send a Reply</div>
+    <form method="POST" action="{{ url_for('reply') }}">
+      <input type="hidden" name="resident" value="{{ resident }}">
+      <div class="form-group">
+        <label>Message</label>
+        <textarea name="message" placeholder="Write your response to {{ resident | capitalize }}..."></textarea>
+      </div>
+      <button type="submit" class="btn btn-dark">Send Message</button>
+    </form>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,7 @@
+[tool.basedpyright]
+typeCheckingMode = "off"
+pythonVersion = "3.11"
+
+[tool.pyright]
+typeCheckingMode = "off"
+pythonVersion = "3.11"
